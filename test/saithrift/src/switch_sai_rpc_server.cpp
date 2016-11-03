@@ -1344,6 +1344,9 @@ class switch_sai_rpcHandler : virtual public switch_sai_rpcIf {
             case SAI_ACL_TABLE_ATTR_STAGE:
                 attr_list[i].value.u32 = attribute.value.u32;
                 break;
+            case SAI_ACL_TABLE_ATTR_BIND_POINT:
+                attr_list[i].value.u32 = attribute.value.u32;
+                break;
             case SAI_ACL_TABLE_ATTR_PRIORITY:
                 attr_list[i].value.u32 = attribute.value.u32;
                 break;
@@ -1545,6 +1548,142 @@ class switch_sai_rpcHandler : virtual public switch_sai_rpcIf {
       }
   }
 
+  void sai_thrift_parse_acl_bind_object_attributes(const std::vector<sai_thrift_attribute_t> &thrift_attr_list, sai_attribute_t *attr_list) {
+      std::vector<sai_thrift_attribute_t>::const_iterator it = thrift_attr_list.begin();
+      sai_thrift_attribute_t attribute;
+      for(uint32_t i = 0; i < thrift_attr_list.size(); i++, it++) {
+          attribute = (sai_thrift_attribute_t)*it;
+          attr_list[i].id = attribute.id;
+          switch (attribute.id) {
+            case SAI_ACL_BIND_OBJECT_ATTR_TABLE_ID:
+                  thrift_attribute_value.oid = attribute.value.oid;
+                  break;
+            case SAI_PORT_ATTR_INGRESS_ACL_LIST:
+                {
+                    int count = attribute.value.aclfield.data.objlist.object_id_list.size();
+                    sai_object_id_t *oid_list = NULL;
+                    std::vector<sai_thrift_object_id_t>::const_iterator it = attribute.value.aclfield.data.objlist.object_id_list.begin();
+                    oid_list = (sai_object_id_t *) malloc(sizeof(sai_object_id_t) * count);
+                    for(int j = 0; j < count; j++, it++)
+                        *(oid_list + j) = (sai_object_id_t) *it;
+                    attr_list[i].value.aclfield.data.objlist.list = oid_list;
+                    attr_list[i].value.aclfield.data.objlist.count = count;
+                }
+                break;
+            case SAI_PORT_ATTR_EGRESS_ACL_LIST:
+                {
+                    int count = attribute.value.aclfield.data.objlist.object_id_list.size();
+                    sai_object_id_t *oid_list = NULL;
+                    std::vector<sai_thrift_object_id_t>::const_iterator it = attribute.value.aclfield.data.objlist.object_id_list.begin();
+                    oid_list = (sai_object_id_t *) malloc(sizeof(sai_object_id_t) * count);
+                    for(int j = 0; j < count; j++, it++)
+                        *(oid_list + j) = (sai_object_id_t) *it;
+                    attr_list[i].value.aclfield.data.objlist.list = oid_list;
+                    attr_list[i].value.aclfield.data.objlist.count = count;
+                }
+                break;
+            case SAI_LAG_ATTR_INGRESS_ACL_LIST:
+                {
+                    int count = attribute.value.aclfield.data.objlist.object_id_list.size();
+                    sai_object_id_t *oid_list = NULL;
+                    std::vector<sai_thrift_object_id_t>::const_iterator it = attribute.value.aclfield.data.objlist.object_id_list.begin();
+                    oid_list = (sai_object_id_t *) malloc(sizeof(sai_object_id_t) * count);
+                    for(int j = 0; j < count; j++, it++)
+                        *(oid_list + j) = (sai_object_id_t) *it;
+                    attr_list[i].value.aclfield.data.objlist.list = oid_list;
+                    attr_list[i].value.aclfield.data.objlist.count = count;
+                }
+                break;
+            case SAI_LAG_ATTR_EGRESS_ACL_LIST:
+                {
+                    int count = attribute.value.aclfield.data.objlist.object_id_list.size();
+                    sai_object_id_t *oid_list = NULL;
+                    std::vector<sai_thrift_object_id_t>::const_iterator it = attribute.value.aclfield.data.objlist.object_id_list.begin();
+                    oid_list = (sai_object_id_t *) malloc(sizeof(sai_object_id_t) * count);
+                    for(int j = 0; j < count; j++, it++)
+                        *(oid_list + j) = (sai_object_id_t) *it;
+                    attr_list[i].value.aclfield.data.objlist.list = oid_list;
+                    attr_list[i].value.aclfield.data.objlist.count = count;
+                }
+                break;
+            case SAI_VLAN_ATTR_INGRESS_ACL_LIST:
+                {
+                    int count = attribute.value.aclfield.data.objlist.object_id_list.size();
+                    sai_object_id_t *oid_list = NULL;
+                    std::vector<sai_thrift_object_id_t>::const_iterator it = attribute.value.aclfield.data.objlist.object_id_list.begin();
+                    oid_list = (sai_object_id_t *) malloc(sizeof(sai_object_id_t) * count);
+                    for(int j = 0; j < count; j++, it++)
+                        *(oid_list + j) = (sai_object_id_t) *it;
+                    attr_list[i].value.aclfield.data.objlist.list = oid_list;
+                    attr_list[i].value.aclfield.data.objlist.count = count;
+                }
+                break;
+            case SAI_VLAN_ATTR_EGRESS_ACL_LIST:
+                {
+                    int count = attribute.value.aclfield.data.objlist.object_id_list.size();
+                    sai_object_id_t *oid_list = NULL;
+                    std::vector<sai_thrift_object_id_t>::const_iterator it = attribute.value.aclfield.data.objlist.object_id_list.begin();
+                    oid_list = (sai_object_id_t *) malloc(sizeof(sai_object_id_t) * count);
+                    for(int j = 0; j < count; j++, it++)
+                        *(oid_list + j) = (sai_object_id_t) *it;
+                    attr_list[i].value.aclfield.data.objlist.list = oid_list;
+                    attr_list[i].value.aclfield.data.objlist.count = count;
+                }
+                break;
+            case SAI_ROUTER_INTERFACE_ATTR_INGRESS_ACL_LIST:
+                {
+                    int count = attribute.value.aclfield.data.objlist.object_id_list.size();
+                    sai_object_id_t *oid_list = NULL;
+                    std::vector<sai_thrift_object_id_t>::const_iterator it = attribute.value.aclfield.data.objlist.object_id_list.begin();
+                    oid_list = (sai_object_id_t *) malloc(sizeof(sai_object_id_t) * count);
+                    for(int j = 0; j < count; j++, it++)
+                        *(oid_list + j) = (sai_object_id_t) *it;
+                    attr_list[i].value.aclfield.data.objlist.list = oid_list;
+                    attr_list[i].value.aclfield.data.objlist.count = count;
+                }
+                break;
+            case SAI_ROUTER_INTERFACE_ATTR_EGRESS_ACL_LIST:
+                {
+                    int count = attribute.value.aclfield.data.objlist.object_id_list.size();
+                    sai_object_id_t *oid_list = NULL;
+                    std::vector<sai_thrift_object_id_t>::const_iterator it = attribute.value.aclfield.data.objlist.object_id_list.begin();
+                    oid_list = (sai_object_id_t *) malloc(sizeof(sai_object_id_t) * count);
+                    for(int j = 0; j < count; j++, it++)
+                        *(oid_list + j) = (sai_object_id_t) *it;
+                    attr_list[i].value.aclfield.data.objlist.list = oid_list;
+                    attr_list[i].value.aclfield.data.objlist.count = count;
+                }
+                break;
+            case SAI_SWITCH_ATTR_DEFAULT_INGRESS_ACL_LIST:
+                {
+                    int count = attribute.value.aclfield.data.objlist.object_id_list.size();
+                    sai_object_id_t *oid_list = NULL;
+                    std::vector<sai_thrift_object_id_t>::const_iterator it = attribute.value.aclfield.data.objlist.object_id_list.begin();
+                    oid_list = (sai_object_id_t *) malloc(sizeof(sai_object_id_t) * count);
+                    for(int j = 0; j < count; j++, it++)
+                        *(oid_list + j) = (sai_object_id_t) *it;
+                    attr_list[i].value.aclfield.data.objlist.list = oid_list;
+                    attr_list[i].value.aclfield.data.objlist.count = count;
+                }
+                break;
+            case SAI_SWITCH_ATTR_DEFAULT_EGRESS_ACL_LIST:
+                {
+                    int count = attribute.value.aclfield.data.objlist.object_id_list.size();
+                    sai_object_id_t *oid_list = NULL;
+                    std::vector<sai_thrift_object_id_t>::const_iterator it = attribute.value.aclfield.data.objlist.object_id_list.begin();
+                    oid_list = (sai_object_id_t *) malloc(sizeof(sai_object_id_t) * count);
+                    for(int j = 0; j < count; j++, it++)
+                        *(oid_list + j) = (sai_object_id_t) *it;
+                    attr_list[i].value.aclfield.data.objlist.list = oid_list;
+                    attr_list[i].value.aclfield.data.objlist.count = count;
+                }
+                break;
+            default:
+                break;
+          }
+      }
+  }
+
   sai_thrift_object_id_t sai_thrift_create_acl_table(const std::vector<sai_thrift_attribute_t> & thrift_attr_list) {
       sai_object_id_t acl_table = 0ULL;
       sai_acl_api_t *acl_api;
@@ -1658,6 +1797,34 @@ class switch_sai_rpcHandler : virtual public switch_sai_rpcIf {
                              attr_count,
                              thrift_attr_values);
       return;
+  }
+
+  sai_thrift_object_id_t sai_thrift_acl_bind_to_object(const std::vector<sai_thrift_attribute_t> & thrift_attr_list) {
+      sai_object_id_t acl_bind_object_id = 0ULL;
+      sai_acl_api_t *acl_api;
+      sai_status_t status = SAI_STATUS_SUCCESS;
+      status = sai_api_query(SAI_API_ACL, (void **) &acl_api);
+      if (status != SAI_STATUS_SUCCESS) {
+          return status;
+      }
+
+      sai_attribute_t *attr_list = (sai_attribute_t *) malloc(sizeof(sai_attribute_t) * thrift_attr_list.size());
+      sai_thrift_parse_acl_bind_object_attributes(thrift_attr_list, attr_list);
+      uint32_t attr_count = thrift_attr_list.size();
+      status = acl_api->acl_bind_to_object(&acl_bind_object_id, attr_count, attr_list);
+      free(attr_list);
+      return acl_bind_object_id;
+  }
+
+  sai_thrift_status_t sai_thrift_acl_unbind_from_object(const sai_thrift_object_id_t acl_table_id) {
+      sai_status_t status = SAI_STATUS_SUCCESS;
+      sai_acl_api_t *acl_api;
+      status = sai_api_query(SAI_API_ACL, (void **) &acl_api);
+      if (status != SAI_STATUS_SUCCESS) {
+          return status;
+      }
+      status = acl_api->acl_unbind_from_object(acl_bind_object_id);
+      return status;
   }
 
   void sai_thrift_parse_mirror_session_attributes(const std::vector<sai_thrift_attribute_t> &thrift_attr_list, sai_attribute_t *attr_list) {

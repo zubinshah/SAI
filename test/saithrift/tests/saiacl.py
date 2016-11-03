@@ -24,7 +24,7 @@ import sai_base_test
 class IPAclTest(sai_base_test.ThriftInterfaceDataPlane):
     def runTest(self):
         print
-        print "Sending packet port 1 -> port 2 (192.168.0.1 -> 10.10.10.1 [id = 101])"
+        print "Sending packet port 2 -> port 1 (192.168.0.1 -> 10.10.10.1 [id = 105])"
         switch_init(self.client)
         port1 = port_list[1]
         port2 = port_list[2]
@@ -43,10 +43,10 @@ class IPAclTest(sai_base_test.ThriftInterfaceDataPlane):
         dmac1 = '00:11:22:33:44:55'
         sai_thrift_create_neighbor(self.client, addr_family, rif_id1, ip_addr1, dmac1)
         nhop1 = sai_thrift_create_nhop(self.client, addr_family, ip_addr1, rif_id1)
-        sai_thrift_create_route(self.client, vr_id, addr_family, ip_addr1, ip_mask1, nhop1)
+        sai_thrift_create_route(self.client, vr_id, addr_family, ip_addr1, ip_mask1, rif_id1)
 
         # send the test packet(s)
-        pkt = simple_tcp_packet(eth_dst='00:77:66:55:44:33',
+        pkt = simple_tcp_packet(eth_dst=router_mac,
                                 eth_src='00:22:22:22:22:22',
                                 ip_dst='10.10.10.1',
                                 ip_src='192.168.0.1',
@@ -54,7 +54,7 @@ class IPAclTest(sai_base_test.ThriftInterfaceDataPlane):
                                 ip_ttl=64)
         exp_pkt = simple_tcp_packet(
                                 eth_dst='00:11:22:33:44:55',
-                                eth_src='00:77:66:55:44:33',
+                                eth_src=router_mac,
                                 ip_dst='10.10.10.1',
                                 ip_src='192.168.0.1',
                                 ip_id=105,
@@ -65,7 +65,7 @@ class IPAclTest(sai_base_test.ThriftInterfaceDataPlane):
             verify_packets(self, exp_pkt, [1])
         finally:
             # cleanup
-            sai_thrift_remove_route(self.client, vr_id, addr_family, ip_addr1, ip_mask1, nhop1)
+            sai_thrift_remove_route(self.client, vr_id, addr_family, ip_addr1, ip_mask1, rif_id1)
             self.client.sai_thrift_remove_next_hop(nhop1)
             sai_thrift_remove_neighbor(self.client, addr_family, rif_id1, ip_addr1, dmac1)
 
@@ -74,9 +74,14 @@ class IPAclTest(sai_base_test.ThriftInterfaceDataPlane):
 
             self.client.sai_thrift_remove_virtual_router(vr_id)
 
+        # setup mandatory attributes on creation ACL table
+        stage = SAI_ACL_STAGE_INGRESS
+        bind_point = SAI_ACL_BIND_POINT_PORT
+        table_priority = SAI_SWITCH_ATTR_ACL_TABLE_MINIMUM_PRIORITY
 
         # setup ACL to block based on Source IP
-        action = 1 #Drop
+        entry_priority = SAI_SWITCH_ATTR_ACL_ENTRY_MINIMUM_PRIORITY
+        action = SAI_PACKET_ACTION_DROP
         in_ports = [port1, port2]
         ip_src = "192.168.0.1"
         ip_src_mask = "255.255.255.0"
@@ -89,21 +94,51 @@ class IPAclTest(sai_base_test.ThriftInterfaceDataPlane):
         ingress_mirror_id = None
         egress_mirror_id = None
 
+        # setup bind object id
+        bind_to_ingress_port_id_list = [rif_id1]
+        bind_to_egress_port_id_list = None
+        bind_to_ingress_lag_id_list = None
+        bind_to_egress_lag_id_list = None
+        bind_to_ingress_vlan_id_list = None
+        bind_to_egress_vlan_id_list = None
+        bind_to_ingress_rif_id_list = None
+        bind_to_egress_rif_id_list = None
+        bind_to_ingress_switch_id_list = None
+        bind_to_egress_switch_id_list = None
+
         acl_table_id = sai_thrift_create_acl_table(self.client, addr_family,
-                                               ip_src, ip_dst,
-                                               ip_proto,
-                                               in_ports, out_ports,
-                                               in_port, out_port)
+                                                   stage,
+                                                   bind_point,
+                                                   table_priority,
+                                                   ip_src, ip_dst,
+                                                   ip_proto,
+                                                   in_ports, out_ports,
+                                                   in_port, out_port)
 
         acl_entry_id = sai_thrift_create_acl_entry(self.client, acl_table_id,
-                                               action, addr_family,
-                                               ip_src, ip_src_mask,
-                                               ip_dst, ip_dst_mask,
-                                               ip_proto,
-                                               in_ports, out_ports,
-                                               in_port, out_port,
-                                               ingress_mirror_id,
-                                               egress_mirror_id)
+                                                   addr_family,
+                                                   entry_priority,
+                                                   action,
+                                                   ip_src, ip_src_mask,
+                                                   ip_dst, ip_dst_mask,
+                                                   ip_proto,
+                                                   in_ports, out_ports,
+                                                   in_port, out_port,
+                                                   ingress_mirror_id,
+                                                   egress_mirror_id)
+
+        acl_bind_object_id = sai_thrift_acl_bind_to_object(self.client, acl_table_id,
+                                                           bind_to_ingress_port_id_list,
+                                                           bind_to_egress_port_id_list,
+                                                           bind_to_ingress_lag_id_list,
+                                                           bind_to_egress_lag_id_list,
+                                                           bind_to_ingress_vlan_id_list,
+                                                           bind_to_egress_vlan_id_list,
+                                                           bind_to_ingress_rif_id_list,
+                                                           bind_to_egress_rif_id_list,
+                                                           bind_to_ingress_switch_id_list,
+                                                           bind_to_egress_switch_id_list)
+
         try:
             # send the same packet
             send_packet(self, 2, str(pkt))
@@ -112,11 +147,12 @@ class IPAclTest(sai_base_test.ThriftInterfaceDataPlane):
             verify_no_packet(self, exp_pkt, 1)
         finally:
             # delete ACL
+            self.client.sai_thrift_acl_unbind_from_oid(acl_bind_object_id)
             self.client.sai_thrift_delete_acl_entry(acl_entry_id)
             self.client.sai_thrift_delete_acl_table(acl_table_id)
 
             # cleanup
-            sai_thrift_remove_route(self.client, vr_id, addr_family, ip_addr1, ip_mask1, nhop1)
+            sai_thrift_remove_route(self.client, vr_id, addr_family, ip_addr1, ip_mask1, rif_id1)
             self.client.sai_thrift_remove_next_hop(nhop1)
             sai_thrift_remove_neighbor(self.client, addr_family, rif_id1, ip_addr1, dmac1)
 
@@ -124,5 +160,3 @@ class IPAclTest(sai_base_test.ThriftInterfaceDataPlane):
             self.client.sai_thrift_remove_router_interface(rif_id2)
 
             self.client.sai_thrift_remove_virtual_router(vr_id)
-
-

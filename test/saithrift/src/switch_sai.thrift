@@ -261,6 +261,9 @@ service switch_sai_rpc {
                              1: sai_thrift_object_id_t acl_counter_id,
                              2: list<i32> thrift_attr_ids);
 
+    sai_thrift_object_id_t sai_thrift_acl_bind_to_object(1: list<sai_thrift_attribute_t> thrift_attr_list);
+    sai_thrift_status_t sai_thrift_acl_unbind_from_object(1: sai_thrift_object_id_t acl_bind_object_id);
+
     // Mirror API
     sai_thrift_object_id_t sai_thrift_create_mirror_session(1: list<sai_thrift_attribute_t> thrift_attr_list);
     sai_thrift_status_t sai_thrift_remove_mirror_session(1: sai_thrift_object_id_t session_id);
