@@ -95,7 +95,7 @@ class IPAclTest(sai_base_test.ThriftInterfaceDataPlane):
         egress_mirror_id = None
 
         # setup bind object id
-        bind_to_ingress_port_id_list = [rif_id1]
+        bind_to_ingress_port_id_list = [port1]
         bind_to_egress_port_id_list = None
         bind_to_ingress_lag_id_list = None
         bind_to_egress_lag_id_list = None
