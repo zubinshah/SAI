@@ -505,7 +505,7 @@ def sai_thrift_create_acl_entry(client, acl_table_id,
     return acl_entry_id
 
 # ACL bind to oject function
-def sai_thrift_acl_bind_to_object(self.client, acl_table_id,
+def sai_thrift_acl_bind_to_object(client, acl_table_id,
                                   bind_to_ingress_port_id_list,
                                   bind_to_egress_port_id_list,
                                   bind_to_ingress_lag_id_list,

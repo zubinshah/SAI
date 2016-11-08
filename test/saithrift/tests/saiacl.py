@@ -147,7 +147,7 @@ class IPAclTest(sai_base_test.ThriftInterfaceDataPlane):
             verify_no_packet(self, exp_pkt, 1)
         finally:
             # delete ACL
-            self.client.sai_thrift_acl_unbind_from_oid(acl_bind_object_id)
+            self.client.sai_thrift_acl_unbind_from_object(acl_bind_object_id)
             self.client.sai_thrift_delete_acl_entry(acl_entry_id)
             self.client.sai_thrift_delete_acl_table(acl_table_id)
 
