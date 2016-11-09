@@ -351,6 +351,7 @@ def sai_thrift_create_acl_table(client, addr_family,
                                 stage,
                                 bind_point,
                                 table_priority,
+                                mac_src, mac_dst,
                                 ip_src, ip_dst,
                                 ip_proto,
                                 in_ports, out_ports,
@@ -372,6 +373,18 @@ def sai_thrift_create_acl_table(client, addr_family,
     if table_priority != None:
         attribute_value = sai_thrift_attribute_value_t(u32=table_priority)
         attribute = sai_thrift_attribute_t(id=SAI_ACL_TABLE_ATTR_PRIORITY,
+                                           value=attribute_value)
+        acl_attr_list.append(attribute)
+
+    if mac_src != None:
+        attribute_value = sai_thrift_attribute_value_t(booldata=1)
+        attribute = sai_thrift_attribute_t(id=SAI_ACL_TABLE_ATTR_FIELD_SRC_MAC,
+                                           value=attribute_value)
+        acl_attr_list.append(attribute)
+
+    if mac_dst != None:
+        attribute_value = sai_thrift_attribute_value_t(booldata=1)
+        attribute = sai_thrift_attribute_t(id=SAI_ACL_TABLE_ATTR_FIELD_DST_MAC,
                                            value=attribute_value)
         acl_attr_list.append(attribute)
 
@@ -424,6 +437,8 @@ def sai_thrift_create_acl_entry(client, acl_table_id,
                                 addr_family,
                                 entry_priority,
                                 action,
+                                mac_src, mac_src_mask,
+                                mac_dst, mac_dst_mask,
                                 ip_src, ip_src_mask,
                                 ip_dst, ip_dst_mask,
                                 ip_proto,
@@ -444,11 +459,31 @@ def sai_thrift_create_acl_entry(client, acl_table_id,
         attribute = sai_thrift_attribute_t(id=SAI_ACL_ENTRY_ATTR_PRIORITY,
                                            value=attribute_value)
         acl_attr_list.append(attribute)
+    #MAC source
+    if mac_src != None:
+        attribute_value = sai_thrift_attribute_value_t(aclfield=sai_thrift_acl_field_data_t(data = sai_thrift_acl_data_t(mac=mac_src), mask = sai_thrift_acl_mask_t(mac=mac_src_mask)))
+        attribute = sai_thrift_attribute_t(id=SAI_ACL_ENTRY_ATTR_FIELD_SRC_MAC,
+                                           value=attribute_value)
+        acl_attr_list.append(attribute)
+
+    #MAC destination
+    if mac_dst != None:
+        attribute_value = sai_thrift_attribute_value_t(aclfield=sai_thrift_acl_field_data_t(data = sai_thrift_acl_data_t(mac=mac_dst), mask = sai_thrift_acl_mask_t(mac=mac_dst_mask)))
+        attribute = sai_thrift_attribute_t(id=SAI_ACL_ENTRY_ATTR_FIELD_DST_MAC,
+                                           value=attribute_value)
+        acl_attr_list.append(attribute)
 
     #Ip source
     if ip_src != None:
         attribute_value = sai_thrift_attribute_value_t(aclfield=sai_thrift_acl_field_data_t(data = sai_thrift_acl_data_t(ip4=ip_src), mask =sai_thrift_acl_mask_t(ip4=ip_src_mask)))
         attribute = sai_thrift_attribute_t(id=SAI_ACL_ENTRY_ATTR_FIELD_SRC_IP,
+                                           value=attribute_value)
+        acl_attr_list.append(attribute)
+
+    #Ip destination
+    if ip_dst != None:
+        attribute_value = sai_thrift_attribute_value_t(aclfield=sai_thrift_acl_field_data_t(data = sai_thrift_acl_data_t(ip4=ip_dst), mask =sai_thrift_acl_mask_t(ip4=ip_dst_mask)))
+        attribute = sai_thrift_attribute_t(id=SAI_ACL_ENTRY_ATTR_FIELD_DST_IP,
                                            value=attribute_value)
         acl_attr_list.append(attribute)
 
