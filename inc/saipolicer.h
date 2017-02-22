@@ -190,6 +190,7 @@ typedef enum _sai_policer_attr_t
 
     /**
      * @brief Enable/disable counter
+     *
      * Default disabled. Modify List Needs full new set
      *
      * @type sai_s32_list_t sai_packet_action_t
@@ -321,13 +322,12 @@ typedef sai_status_t (*sai_get_policer_stats_fn)(
  * @param[in] counter_ids specifies the array of counter ids
  *
  * @return SAI_STATUS_SUCCESS on success
- *         Failure status code on error
+ *    Failure status code on error
  */
 typedef sai_status_t (*sai_clear_policer_stats_fn)(
-    _In_ sai_object_id_t policer_id,
-    _In_ uint32_t number_of_counters,
-    _In_ const sai_policer_stat_t *counter_ids
-    );
+        _In_ sai_object_id_t policer_id,
+        _In_ uint32_t number_of_counters,
+        _In_ const sai_policer_stat_t *counter_ids);
 
 /**
  * @brief Policer methods table retrieved with sai_api_query()

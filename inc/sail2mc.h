@@ -58,8 +58,18 @@ typedef struct _sai_l2mc_entry_t
      */
     sai_object_id_t switch_id;
 
-    /** Vlan ID */
+    /** Bridge type */
+    sai_fdb_entry_bridge_type_t bridge_type;
+
+    /** Vlan ID. Valid for .1Q */
     sai_vlan_id_t vlan_id;
+
+    /**
+     * Bridge ID. Valid for .1D
+     *
+     * @objects SAI_OBJECT_TYPE_BRIDGE
+     */
+    sai_object_id_t bridge_id;
 
     /** L2MC entry type */
     sai_l2mc_entry_type_t type;
@@ -96,8 +106,8 @@ typedef enum _sai_l2mc_entry_attr_t
      * If the group has no member, packets will be discarded.
      *
      * @type sai_object_id_t
-     * @objects SAI_OBJECT_TYPE_L2MC_GROUP
      * @flags CREATE_AND_SET
+     * @objects SAI_OBJECT_TYPE_L2MC_GROUP
      * @allownull true
      * @default SAI_NULL_OBJECT_ID
      * @validonly SAI_L2MC_ENTRY_ATTR_PACKET_ACTION == SAI_PACKET_ACTION_FORWARD
