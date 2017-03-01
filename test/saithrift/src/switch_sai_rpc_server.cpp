@@ -561,13 +561,14 @@ public:
       if (status != SAI_STATUS_SUCCESS) {
           return status;
       }
-      sai_object_id_t *buffer_profile_list = NULL;
       std::vector<sai_thrift_attribute_t> thrift_attr_list;
       thrift_attr_list.push_back(thrift_attr);
       sai_attribute_t attr;
-      sai_thrift_parse_router_interface_attributes(thrift_attr_list, &attr, &buffer_profile_list);
+      sai_thrift_parse_router_interface_attributes(thrift_attr_list, &attr);
       status = rif_api->set_router_interface_attribute((sai_object_id_t)rif_id, &attr);
-      if (buffer_profile_list) free(buffer_profile_list);
+      if (status != SAI_STATUS_SUCCESS) {
+          SAI_THRIFT_LOG_ERR("Failed to set router interface attributes.");
+      }
       return status;
   }
 
